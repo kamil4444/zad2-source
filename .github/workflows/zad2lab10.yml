@@ -22,8 +22,8 @@ jobs:
           platforms: linux/arm64/v8,linux/amd64
           file: ./Dockerfile
           push: true
-          tags: kamil4444/zad2:${{ github.sha }}
-          cache-from: type=registry,ref=kamil4444/zad2:${{ github.sha }}
+          tags: kamil4/zad2:${{ github.sha }}
+          cache-from: type=registry,ref=kamil4/zad2:${{ github.sha }}
           cache-to: type=inline
   kubernetesCI:
     runs-on: ubuntu-latest
