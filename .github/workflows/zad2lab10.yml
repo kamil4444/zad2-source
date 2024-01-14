@@ -1,0 +1,43 @@
+name: lab10-workflow
+on: workflow_dispatch
+jobs:
+  dockerCI:
+    runs-on: ubuntu-latest
+    steps:
+      - id: checkout
+        uses: actions/checkout@v4
+      - id: qemu
+        uses: docker/setup-qemu-action@v3
+      - id: buildx
+        uses: docker/setup-buildx-action@v3
+      - id: docker_login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - id: docker_build
+        uses: docker/build-push-action@v5
+        with:
+          context: ./
+          platforms: linux/arm64/v8,linux/amd64
+          file: ./Dockerfile
+          push: true
+          tags: kamil4444/zad2:${{ github.sha }}
+          cache-from: type=registry,ref=kamil4444/zad2:${{ github.sha }}
+          cache-to: type=inline
+  kubernetesCI:
+    runs-on: ubuntu-latest
+    steps:
+      - id: checkout
+        uses: actions/checkout@v4
+        with:
+          repository: kamil4444/zad2-config
+          token: ${{ secrets.PAT }}
+      - run: |
+          git config user.name kamil4444
+          git config user.email kamil.rytel@pollub.edu.pl
+          sed -i -E "s/[0-9a-f]{40}/${{ github.sha }}/g" deployment.yml
+          git add .
+          git commit -m "workflow"
+          git push
+  
